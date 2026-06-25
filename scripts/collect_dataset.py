@@ -101,8 +101,8 @@ def main():
     if kept:
         sr = strict_ok / kept * 100
         print(f"  게이트: 전부 ≤{C.COLLECT_THRESH*1000:.0f}mm")
-        print(f"  엄격(target1<3mm·target2<5mm) 충족: {strict_ok}/{kept} = {sr:.0f}%"
-              f"  {'✅(≥20%)' if sr >= 20 else '⚠(<20% — 목표 미달)'}")
+        print(f"  엄격(target1<3mm,target2<5mm) 충족: {strict_ok}/{kept} = {sr:.0f}% "
+              f"{'[OK >=20%]' if sr >= 20 else '[!] <20% 목표미달'}")
         print(f"  per-block gauge mm: mean={per_block.mean(0).round(2)} "
               f"max={per_block.max(0).round(2)} min={per_block.min(0).round(2)}")
         print(f"  미리보기 3캠: out/dataset_preview_3cam.png")

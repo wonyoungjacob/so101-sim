@@ -34,22 +34,24 @@ python scripts/convert_to_lerobot.py --repo-id <USER>/so101_place --raw out/epis
 
 ## 3) 4개 정책 학습  ── B200 (GPU)
 LeRobot CLI는 데이터셋 메타에서 입력 feature(3캠+state)를 자동 구성한다.
+(lerobot 0.5.1은 기본 push_to_hub=true라 `policy.repo_id`를 요구 → 로컬 학습은 `--policy.push_to_hub=false` 필수.
+ 체크포인트 off-B200 백업은 별도 `scripts/hf_backup.py` 데몬으로 처리.)
 ```
 # ACT
 lerobot-train --dataset.repo_id=<USER>/so101_place --policy.type=act \
-    --output_dir=outputs/act --batch_size=8 --steps=40000 --policy.device=cuda
+    --output_dir=outputs/act --batch_size=8 --steps=40000 --policy.device=cuda --policy.push_to_hub=false
 
 # Diffusion Policy
 lerobot-train --dataset.repo_id=<USER>/so101_place --policy.type=diffusion \
-    --output_dir=outputs/diffusion --batch_size=64 --steps=100000 --policy.device=cuda
+    --output_dir=outputs/diffusion --batch_size=64 --steps=100000 --policy.device=cuda --policy.push_to_hub=false
 
 # SmolVLA (사전학습 백본 로드 → 적은 데이터에 적합)
 lerobot-train --dataset.repo_id=<USER>/so101_place --policy.type=smolvla \
-    --output_dir=outputs/smolvla --batch_size=8 --steps=20000 --policy.device=cuda
+    --output_dir=outputs/smolvla --batch_size=8 --steps=20000 --policy.device=cuda --policy.push_to_hub=false
 
 # Pi0.5 (lerobot 0.5.1: type=pi05 확인됨. pi0 / pi0_fast 도 선택 가능)
 lerobot-train --dataset.repo_id=<USER>/so101_place --policy.type=pi05 \
-    --output_dir=outputs/pi05 --batch_size=8 --steps=30000 --policy.device=cuda
+    --output_dir=outputs/pi05 --batch_size=8 --steps=30000 --policy.device=cuda --policy.push_to_hub=false
 ```
 체크포인트: `outputs/<name>/checkpoints/last/pretrained_model`
 (스텝/배치는 GPU 메모리·시간 따라 조정. 50개는 작은 데이터셋이라 과적합 주의 — VLA는 사전학습 덕에 유리.)

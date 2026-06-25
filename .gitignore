@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ipynb_checkpoints/
+
+# 출력물(대용량·생성물) — 데이터셋은 B200에서 새로 수집
+out/
+*.gif
+*.mp4
+
+# 스크래치 진단 스크립트(Windows 전용)
+scripts/_*.py
+
+# OS / 에디터 / 도구
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+
+# 문서·바이너리(B200 불필요)
+*.pdf
+*.pptx
+
+# LeRobot 학습 산출물(B200)
+outputs/
+wandb/
+
+# 비밀/환경
+.env
+*.env

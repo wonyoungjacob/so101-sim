@@ -1,0 +1,5 @@
+# Windows 시현/데이터수집 머신 (GPU 불필요)
+mujoco==3.4.0
+gymnasium>=1.0
+numpy>=2.0
+pillow>=10.0

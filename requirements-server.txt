@@ -1,0 +1,9 @@
+# B200 Linux 학습 머신 (M3 변환 + M4 학습/롤아웃)
+# lerobot은 GitHub 최신 권장: pip install "lerobot[act] @ git+https://github.com/huggingface/lerobot.git"
+lerobot
+torch
+imageio[ffmpeg]
+mujoco==3.4.0
+gymnasium>=1.0
+numpy>=2.0
+pillow>=10.0

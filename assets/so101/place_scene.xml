@@ -1,0 +1,79 @@
+<mujoco model="so101 place scene">
+  <!-- SO-101(SO-ARM100 프록시) 로봇 포함. 경로는 이 파일 기준 상대.
+       좌표계: follower arm base = 원점. 로봇은 +Y(작업영역)를 향하도록 base를 180° 회전(so_arm100.xml).
+       단위 m. 실제 셋업(image.png) mm 좌표를 1/1000로 환산해 배치. -->
+  <include file="so_arm100.xml"/>
+
+  <statistic center="0.09 0.245 0.03" extent="0.6"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="-90" elevation="-30"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3"
+      markrgb="0.8 0.8 0.8" width="300" height="300"/>
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2"/>
+    <material name="yard_mat" rgba="0.80 0.52 0.35 1"/>            <!-- yard: 황토색 -->
+    <material name="block_mat" rgba="0.55 0.55 0.55 1"/>           <!-- 콘크리트색 -->
+    <material name="target_border_mat" rgba="0.05 0.05 0.05 1"/>   <!-- 검정 테두리 -->
+    <material name="target_inner_mat" rgba="0.1 0.8 0.2 0.35"/>    <!-- 내부영역 마커(반투명) -->
+  </asset>
+
+  <worldbody>
+    <light pos="0 0.25 1.5" dir="0 0 -1" directional="true"/>
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+
+    <!-- 작업공간 중심: 카메라 조준 기준(정적 body, dof 없음) -->
+    <body name="work_center" pos="0.09 0.245 0.03" mocap="true">
+      <site name="work_center_site" size="0.003" rgba="1 1 0 0.0"/>
+    </body>
+
+    <!-- 앞(front) 카메라 2개.
+         위치=설계값: 770mm 대칭(X=±0.385), 전방 Y=0(로봇 거치점과 동일), 높이 Z=0.45.
+         방향(aim)·FOV=ChArUco 캘리브 변환(scripts/apply_camera_calib.py):
+           robot frame(+X전방,+Y좌,+Z상)→sim world(+Y전방) mujoco=(-Ry,Rx,Rz), OpenCV→MuJoCo cam(시선 -Z),
+           fovy=2·atan((H/2)/fy)≈70°.  (캘리브 717mm/비대칭/Y·Z는 계산오차로 미사용)
+         왜곡(배럴)·주점offset는 MuJoCo 기본 핀홀로 미반영(philosophy A 허용). -->
+    <camera name="cam_front_left" pos="-0.385 0 0.45"
+      xyaxes="0.7050 -0.7082 -0.0380 0.5149 0.4743 0.7140" fovy="70.27"/>
+    <camera name="cam_front_right" pos="0.385 0 0.45"
+      xyaxes="0.6189 0.7828 0.0642 -0.5884 0.4079 0.6981" fovy="71.57"/>
+
+    <!-- yard: 150x150mm 시각 마커(충돌 없음). 좌하단 (-0.10,0.17), 중심 (-0.025,0.245). -->
+    <geom name="yard" type="box" size="0.075 0.075 0.0005" pos="-0.025 0.245 0.0005"
+      contype="0" conaffinity="0" material="yard_mat"/>
+
+    <!-- 조작 대상 콘크리트 블록 2개: 90x57x30mm, 0.0251kg, free joint.
+         시작 pose는 env.reset에서 배치 A/B로 설정(여기 값은 배치 A 기본). -->
+    <body name="block1" pos="-0.025 0.2065 0.015">
+      <freejoint name="block1_free"/>
+      <geom name="block1" type="box" size="0.045 0.0285 0.015" material="block_mat" mass="0.0251"
+        friction="1 0.01 0.001"/>
+    </body>
+    <body name="block2" pos="-0.025 0.2835 0.015">
+      <freejoint name="block2_free"/>
+      <geom name="block2" type="box" size="0.045 0.0285 0.015" material="block_mat" mass="0.0251"
+        friction="1 0.01 0.001"/>
+    </body>
+
+    <!-- target 1: 내부영역 93x60mm + 검정 테두리 5mm(외곽 103x70mm). 충돌 없음.
+         원래 중심 X=0.1465였으나 프록시 암의 수직 reach 확보 위해 두 target을 함께 -X 30mm 이동. -->
+    <geom name="target1_border" type="box" size="0.0515 0.035 0.0004" pos="0.1165 0.230 0.0004"
+      contype="0" conaffinity="0" material="target_border_mat"/>
+    <geom name="target1_inner" type="box" size="0.0465 0.030 0.0005" pos="0.1165 0.230 0.0009"
+      contype="0" conaffinity="0" material="target_inner_mat"/>
+    <!-- 성공판정용 site: 블록 중심이 와야 할 곳(z=0.015) -->
+    <site name="target1" pos="0.1165 0.230 0.015" size="0.003" rgba="1 1 0 0.0"/>
+
+    <!-- target 2: 원래 중심 X=0.2545 → -30mm 이동. target1 테두리와 5mm 간격 유지. -->
+    <geom name="target2_border" type="box" size="0.0515 0.035 0.0004" pos="0.2245 0.230 0.0004"
+      contype="0" conaffinity="0" material="target_border_mat"/>
+    <geom name="target2_inner" type="box" size="0.0465 0.030 0.0005" pos="0.2245 0.230 0.0009"
+      contype="0" conaffinity="0" material="target_inner_mat"/>
+    <site name="target2" pos="0.2245 0.230 0.015" size="0.003" rgba="1 1 0 0.0"/>
+  </worldbody>
+</mujoco>

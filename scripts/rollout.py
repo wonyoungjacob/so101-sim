@@ -32,16 +32,15 @@ EVAL_SEED0 = 70000000  # held-out(학습 미사용) 평가 시드
 
 
 def load_policy(ckpt: str):
-    """LeRobot 체크포인트에서 정책 로드(타입 자동 판별: act/diffusion/smolvla/pi0...)."""
+    """LeRobot 0.5.x 체크포인트에서 정책 로드(config.json의 type으로 클래스 판별)."""
     import torch
-    try:
-        from lerobot.common.policies.factory import make_policy_from_pretrained
-        policy = make_policy_from_pretrained(ckpt)
-    except Exception:
-        from lerobot.common.policies.factory import get_policy_class
-        import json
-        cfg = json.loads((Path(ckpt) / "config.json").read_text())
-        policy = get_policy_class(cfg["type"]).from_pretrained(ckpt)
+    import json
+    # lerobot 0.5.x: 모듈 경로에서 'common' 제거, make_policy_from_pretrained 없음
+    # → get_policy_class(type).from_pretrained(ckpt)
+    from lerobot.policies.factory import get_policy_class
+    cfg = json.loads((Path(ckpt) / "config.json").read_text())
+    ptype = cfg.get("type") or cfg.get("policy_type")
+    policy = get_policy_class(ptype).from_pretrained(ckpt)
     policy.eval()
     device = "cuda" if torch.cuda.is_available() else "cpu"
     policy.to(device)

@@ -39,7 +39,8 @@ def main():
     args = ap.parse_args()
 
     # lerobot은 서버 전용 의존성 → 함수 내부에서 import
-    from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+    # lerobot 0.5.x: 모듈 경로에서 'common' 제거됨(lerobot.datasets.*)
+    from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
     raw = Path(args.raw)
     eps = sorted(raw.glob("ep_*.npz"))

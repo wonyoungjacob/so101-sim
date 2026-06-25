@@ -34,18 +34,14 @@ EVAL_SEED0 = 70000000  # 학습 데이터 시드(20260624+)와 겹치지 않는 
 
 
 def load_policy(ckpt: str):
-    """LeRobot 체크포인트(디렉터리)에서 정책 로드. 정책 타입은 저장된 config로 자동 판별."""
+    """LeRobot 0.5.x 체크포인트(디렉터리)에서 정책 로드. config.json의 type으로 클래스 판별."""
     import torch
-    policy = None
-    try:
-        from lerobot.common.policies.factory import make_policy_from_pretrained
-        policy = make_policy_from_pretrained(ckpt)
-    except Exception:
-        # 구/신 버전 호환: 타입별 클래스 직접 시도
-        from lerobot.common.policies.factory import get_policy_class
-        import json
-        cfg = json.loads((Path(ckpt) / "config.json").read_text())
-        policy = get_policy_class(cfg["type"]).from_pretrained(ckpt)
+    import json
+    # lerobot 0.5.x: 'common' 경로 제거, factory는 get_policy_class/make_policy 제공
+    from lerobot.policies.factory import get_policy_class
+    cfg = json.loads((Path(ckpt) / "config.json").read_text())
+    ptype = cfg.get("type") or cfg.get("policy_type")
+    policy = get_policy_class(ptype).from_pretrained(ckpt)
     policy.eval()
     device = "cuda" if torch.cuda.is_available() else "cpu"
     policy.to(device)

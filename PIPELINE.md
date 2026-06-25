@@ -28,7 +28,7 @@ DATASET_FPS=20 — 100Hz 제어를 IL 적정 레이트로). `out/episodes/`를 B
 
 ## 2) LeRobot 데이터셋 변환  ── B200
 ```
-python scripts/convert_to_lerobot.py --repo-id <USER>/so101_place --raw out/episodes --fps 10
+python scripts/convert_to_lerobot.py --repo-id <USER>/so101_place --raw out/episodes --fps 20
 ```
 → 3캠 video 스키마 LeRobotDataset 생성(features: front_left/right/wrist + state + action + eef_pose).
 
@@ -47,8 +47,8 @@ lerobot-train --dataset.repo_id=<USER>/so101_place --policy.type=diffusion \
 lerobot-train --dataset.repo_id=<USER>/so101_place --policy.type=smolvla \
     --output_dir=outputs/smolvla --batch_size=8 --steps=20000 --policy.device=cuda
 
-# Pi0.5 (lerobot 버전에 따라 type=pi0 또는 pi05; pi0fast도 가능)
-lerobot-train --dataset.repo_id=<USER>/so101_place --policy.type=pi0 \
+# Pi0.5 (lerobot 0.5.1: type=pi05 확인됨. pi0 / pi0_fast 도 선택 가능)
+lerobot-train --dataset.repo_id=<USER>/so101_place --policy.type=pi05 \
     --output_dir=outputs/pi05 --batch_size=8 --steps=30000 --policy.device=cuda
 ```
 체크포인트: `outputs/<name>/checkpoints/last/pretrained_model`

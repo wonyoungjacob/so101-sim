@@ -89,6 +89,5 @@ python scripts/collect_dataset.py --num 50 --fresh   # 시연 50개 → out/epis
 ## 만든 사람
 
 정원영 (연세대 건설환경공학과, 스마트인프라연구실 학부연구생). 연구실의 실물 SO-101 셋업을 시뮬레이션으로 옮기려고 만들었다.
-실험 설계와 검증은 직접 했고, 코드는 AI 코딩 도구(Claude Code, Codex)로 구현했다.
 
 로봇 모델: [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) `trs_so_arm100` ([The Robot Studio](https://www.therobotstudio.com/) SO-ARM100 기반, Apache-2.0, [assets/so101/LICENSE](assets/so101/LICENSE)).

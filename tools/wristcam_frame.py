@@ -1,14 +1,21 @@
 """wrist cam 마운트 STL 분석: 32x32 카메라 창면의 중심·법선 추출.
 
-README_wristcam.md 절차(방법 C, STL 폴백):
+Fusion 360을 쓸 수 없을 때의 STL 폴백(Fusion 판은 tools/fusion360/wristcam/):
 - 면적 ≈ 1024(=32x32)인 평면 면이 카메라 면.
 - 광학중심 = 창중심 + 18mm × (보는 방향 법선).
 좌표는 마운트 자체(디자인 원점) 기준. (손목링크 변환은 별도 필요)
+
+사용: python tools/wristcam_frame.py [STL 경로]   (기본: hardware/wrist_cam_mount/ 의 STL)
 """
 
 import sys
 from collections import defaultdict
+from pathlib import Path
+
 import numpy as np
+
+DEFAULT_STL = (Path(__file__).resolve().parents[1] / "hardware" / "wrist_cam_mount"
+               / "Wrist_Cam_Mount_32x32_UVC_Module_SO101.stl")
 
 
 def parse_ascii_stl(path):
@@ -34,8 +41,7 @@ def tri_area(t):
 
 
 def main():
-    path = sys.argv[1] if len(sys.argv) > 1 else \
-        r"C:\Users\user\Downloads\Wrist_Cam_Mount_32x32_UVC_Module_SO101.stl"
+    path = sys.argv[1] if len(sys.argv) > 1 else str(DEFAULT_STL)
     normals, tris = parse_ascii_stl(path)
     F = len(tris)
     allv = tris.reshape(-1, 3)

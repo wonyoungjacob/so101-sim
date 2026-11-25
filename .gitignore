@@ -31,3 +31,6 @@ wandb/
 # 비밀/환경
 .env
 *.env
+
+# pytest
+.pytest_cache/
